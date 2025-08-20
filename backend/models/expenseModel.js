@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const expenseSchema = new mongoose.Schema({
     date:{
@@ -27,6 +27,6 @@ const expenseSchema = new mongoose.Schema({
     }
 });
 
-const Expense = mongoose.Model("Expense",expenseSchema);
+const Expense = mongoose.model("Expense",expenseSchema);
 
 export default Expense;
