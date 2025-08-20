@@ -17,7 +17,8 @@
   "scripts": {
     "server": "nodemon backend/index.js",
     "client": "npm run dev --prefix frontend",
-    "dev": "concurrently \"npm run client\" \"npm run server\""
+    "dev": "concurrently \"npm run client\" \"npm run server\"",
+    "import":"node backend/seeder.js"
   },
   "dependencies": {
     "concurrently": "^9.2.0",
