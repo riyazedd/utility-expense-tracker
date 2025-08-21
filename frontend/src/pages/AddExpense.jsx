@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { ADToBS } from 'bikram-sambat-js';
 import NepaliDatePickerComponent from '../components/NepaliDatePicker';
+import API from '../API.jsx';
 
 const getDefaultDate = () => {
   // Always set to 8th of current BS month
@@ -36,11 +36,48 @@ const AddExpense = () => {
     }
   };
 
+  // console.log("Date:", date);
+
   // Calculate total expense
   const totalExpense =
     (parseInt(elecPrice || 0, 10) || 0) +
     (parseInt(waterPrice || 0, 10) || 0) +
     (parseInt(wastePrice || 0, 10) || 0);
+
+  
+    const insertExpense = async (e) => {
+      e.preventDefault();
+      const expenseData = {
+        date: date,
+        current_unit: elecCurrent,
+        previous_unit: elecPrev,
+        total_unit: elecTotal,
+        total_electricity_price: elecPrice,
+        water_price: waterPrice,
+        waste_price: wastePrice,
+        total_expense: totalExpense
+
+
+      };
+      try {
+        const response = await API.post('api/expenses', expenseData);
+        if (response.status === 201) {
+          alert('Expense added successfully!');
+          // Reset form fields
+          setDate(getDefaultDate());
+          setElecCurrent('');
+          setElecPrev('');
+          setElecTotal('');
+          setElecPrice('');
+          setWaterPrice('');
+          setWastePrice('100');
+        }
+      } catch (error) {
+        console.error('Error adding expense:', error);
+        alert('Failed to add expense. Please try again.');
+      }
+
+    }
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-8 mt-10 mb-10">
@@ -49,7 +86,7 @@ const AddExpense = () => {
         <h1 className="text-3xl font-extrabold mb-8 text-center text-gray-800 tracking-tight flex items-center justify-center gap-2">
           <span role="img" aria-label="money">💸</span> Add Expense
         </h1>
-        <form className="flex flex-col gap-8">
+        <form className="flex flex-col gap-8" onSubmit={insertExpense}>
           {/* Date Field */}
           <div className="flex flex-col gap-1">
             <label className="block mb-2 text-lg font-semibold text-gray-700">Date (BS)</label>
