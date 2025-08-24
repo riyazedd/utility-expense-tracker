@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ADToBS } from 'bikram-sambat-js';
 import NepaliDatePickerComponent from '../components/NepaliDatePicker';
 import API from '../API.jsx';
@@ -18,6 +18,34 @@ const AddExpense = () => {
   const [date, setDate] = useState(getDefaultDate());
   const [elecCurrent, setElecCurrent] = useState('');
   const [elecPrev, setElecPrev] = useState('');
+  // Fetch previous month's current_unit when date changes
+  useEffect(() => {
+    const fetchPrevMonthUnit = async () => {
+      if (!date) return;
+      const [year, month] = date.split('-');
+      let prevYear = parseInt(year, 10);
+      let prevMonth = parseInt(month, 10) - 1;
+      if (prevMonth === 0) {
+        prevMonth = 12;
+        prevYear -= 1;
+      }
+      const prevMonthStr = prevMonth.toString().padStart(2, '0');
+      const prevDatePrefix = `${prevYear}-${prevMonthStr}`;
+      try {
+        const response = await API.get('api/expenses');
+        const prevExpense = response.data.find(exp => exp.date && exp.date.startsWith(prevDatePrefix));
+        if (prevExpense && prevExpense.current_unit) {
+          setElecPrev(prevExpense.current_unit.toString());
+        } else {
+          setElecPrev('');
+        }
+      } catch (error) {
+        setElecPrev('');
+      }
+    };
+    fetchPrevMonthUnit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date]);
   const [elecTotal, setElecTotal] = useState('');
   const [elecPrice, setElecPrice] = useState('');
   const [waterPrice, setWaterPrice] = useState('');
